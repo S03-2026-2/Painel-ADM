@@ -151,3 +151,25 @@ As duas continuam falando com o mesmo serviço de Jogadores, mas cada controle c
 precisa. O [diagrama de classes](../03-diagrama-de-classes/README.md) e o diagrama de sequência
 de [autenticação](../04-diagramas-de-sequencia/README.md#sq01--autenticar-administrador) foram
 atualizados.
+
+## Inversão de dependência (DIP)
+
+**Teoria:** as dependências devem ser estabelecidas **com abstrações, e não com implementações
+concretas**. Em outras palavras: prefira interfaces a classes e seja o mais abstrato possível.
+
+**No painel:**
+- **Os controles dependem só das interfaces:** `CtrlAutenticacao` usa `IAutenticacao`,
+  `CtrlJogadores` usa `IServicoJogadores`, `CtrlCartasJogadores` usa `IServicoCartas`, e assim
+  por diante. Nenhum controle conhece a classe que fala com o outro grupo.
+- **As classes concretas ficam do outro lado da interface:** `ClienteServicoJogadores`,
+  `ClienteServicoCartas` e `ClienteServicoTrocas` **realizam** as interfaces (seta tracejada com
+  triângulo vazio no [diagrama de classes](../03-diagrama-de-classes/README.md)). Só elas sabem
+  como acessar cada serviço.
+- **Uma classe, duas interfaces pequenas:** `ClienteServicoJogadores` implementa `IAutenticacao`
+  e `IServicoJogadores`. Os dois contratos ficam separados (ISP) mesmo vindo do mesmo serviço.
+- **Nos diagramas de sequência**, as linhas de vida dos serviços são as interfaces
+  (`«interface» :IServicoCartas`…), porque é só isso que o controle conhece.
+
+**Ganho:** se um grupo mudar a forma de entregar os dados, ou se for preciso uma implementação
+de teste, só muda a classe `Cliente*`. Os controles e as telas continuam iguais. Isso é o que
+torna possíveis o **OCP** e o **LSP** descritos acima.

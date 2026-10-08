@@ -9,7 +9,8 @@ diagramas:
 
 | Estereótipo | Cor | No painel |
 |---|---|---|
-| **«boundary»** (fronteira) | azul | Comunicação entre o caso de uso e o ator. São as **telas** (`TelaLogin`, `TelaJogadores`…), uma por caso de uso. Também as **fronteiras com os outros sistemas**: `IAutenticacao`, `IServicoJogadores`, `IServicoCartas` e `IServicoTrocas`. Uma fronteira também pode ser uma API. |
+| **«boundary»** (fronteira) | azul | Comunicação entre o caso de uso e o ator. São as **telas** (`TelaLogin`, `TelaJogadores`…), uma por caso de uso. Também as **fronteiras com os outros sistemas**: `ClienteServicoJogadores`, `ClienteServicoCartas` e `ClienteServicoTrocas`, que conversam de fato com cada serviço. Uma fronteira também pode ser uma API. |
+| **«interface»** | azul | Contratos que os controles usam para pedir dados aos outros grupos: `IAutenticacao`, `IServicoJogadores`, `IServicoCartas` e `IServicoTrocas`. Cada `Cliente*` **realiza** (implementa) uma ou mais interfaces: seta tracejada com triângulo vazio. |
 | **«control»** (controle) | amarelo | "Ponte" entre fronteira e entidade, com a lógica de cada caso de uso. Por exemplo, `CtrlCartasJogadores` agrupa as cartas por jogador. |
 | **«entity»** (entidade) | verde | As informações: `Jogador`, `Carta`, `Troca`, `Proposta`, que vêm dos outros grupos, e `Sessao` e `ResumoPainel`, que o painel monta. O painel **não persiste** nenhuma delas. |
 
@@ -20,7 +21,7 @@ diagramas:
   pode ser alterado por fora.
 - **Interface como contrato:** `IAutenticacao`, `IServicoJogadores`, `IServicoCartas` e `IServicoTrocas` dizem
   **o que** cada serviço oferece. Os controles usam só esse contrato, sem conhecer **como** o
-  serviço é acessado (abstração).
+  serviço é acessado (abstração). Quem sabe o "como" são as classes `Cliente*`.
 - **DTO:** as entidades só carregam os dados recebidos dos outros grupos, no estilo JavaBean/DTO.
 - **Reuso:** `CtrlCartasJogadores` **reutiliza** `CtrlJogadores` para obter os nicks.
 

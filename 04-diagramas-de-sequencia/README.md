@@ -5,7 +5,7 @@ Um diagrama por caso de uso, como modelo explicativo do cenário básico. Elemen
 | Elemento | Como aparece |
 |---|---|
 | **Ator** | Jogador (ADM), que inicia o fluxo |
-| **Linhas de vida** | objetos «boundary», «control» e «entity» do [diagrama de classes](../03-diagrama-de-classes/README.md) |
+| **Linhas de vida** | objetos «boundary», «control» e «interface» do [diagrama de classes](../03-diagrama-de-classes/README.md). Os controles conversam com as interfaces, sem saber qual classe as implementa |
 | **Foco de controle (ativação)** | retângulo sobre a linha de vida enquanto o objeto executa um método |
 | **Mensagem síncrona** | seta cheia: chamada de método |
 | **Mensagem de retorno** | seta tracejada: resposta da chamada |
