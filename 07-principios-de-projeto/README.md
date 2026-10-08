@@ -39,3 +39,23 @@ Getters e setters só devem existir quando fizer sentido: um setter é uma expos
   usa não precisa saber que ele vem da diferença entre agora e `dataAbertura`.
 - **As telas não sabem de onde vêm os dados:** elas só chamam métodos públicos dos controles. Se
   a forma de consultar os outros grupos mudar, as telas não mudam.
+
+## Coesão
+
+**Teoria:** toda classe deve implementar uma única funcionalidade ou serviço, e todos os seus
+métodos e atributos trabalham para isso. Uma classe coesa é mais fácil de implementar, entender,
+manter e testar, e pode ter um único responsável.
+
+**No painel:**
+- **Cada tipo de classe faz uma coisa só:**
+  - as **telas** só exibem dados e recebem as ações do administrador;
+  - os **controles** só organizam os dados de um caso de uso (juntar, contar, agrupar);
+  - as **interfaces de serviço** só conversam com um serviço externo;
+  - as **entidades** só carregam dados.
+- **Um controle por caso de uso:** `CtrlAutenticacao`, `CtrlResumo`, `CtrlJogadores` e
+  `CtrlCartasJogadores`.
+- **Decisão sobre o `CtrlTrocas`:** ele atende três casos de uso (trocas em aberto, propostas e
+  histórico). Mantivemos um único controle porque os três trabalham com os mesmos dados (trocas
+  e propostas) e consultam o mesmo serviço, então os métodos estão fortemente relacionados. Se
+  esses casos de uso passarem a mudar por motivos diferentes, o controle pode ser dividido em
+  três.
