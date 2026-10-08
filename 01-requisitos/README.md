@@ -40,7 +40,7 @@ próprios. Isso é responsabilidade dos outros grupos.
 | RNF02 | Segurança | O painel não altera dados de nenhum serviço, só consulta. |
 | RNF03 | Usabilidade | Se um serviço estiver fora do ar, o painel mostra um aviso e as outras abas continuam funcionando. |
 | RNF04 | Desempenho | Cada tela faz **no máximo uma consulta por serviço**. Exemplo: as cartas vêm todas de uma vez, não uma consulta por jogador. |
-| RNF05 | Manutenibilidade | Cada serviço externo é acessado por uma interface própria (`IServicoJogadores`, `IServicoCartas`, `IServicoTrocas`). Se um serviço mudar, só a classe dessa interface muda. |
+| RNF05 | Manutenibilidade | Cada serviço externo é acessado por uma interface própria (`IAutenticacao`, `IServicoJogadores`, `IServicoCartas`, `IServicoTrocas`). Se um serviço mudar, só a classe dessa interface muda. |
 
 ## Dependências e pontos em aberto
 

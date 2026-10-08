@@ -130,3 +130,24 @@ implementação de `IServicoCartas`:
 
 Uma implementação que devolvesse só parte das cartas ou alterasse dados quebraria o
 `CtrlCartasJogadores`, mesmo tendo os mesmos métodos. Isso violaria o LSP.
+
+## Segregação de interfaces (ISP)
+
+**Teoria:** é melhor ter **interfaces pequenas e específicas** do que uma interface grande que
+obrigue os clientes a depender de métodos que não usam.
+
+**No painel:** antes, `IServicoJogadores` tinha dois métodos:
+
+| Método | Quem usa |
+|---|---|
+| `autenticar(login, senha)` | só o `CtrlAutenticacao` |
+| `buscarTodos()` | só o `CtrlResumo` e o `CtrlJogadores` |
+
+Cada controle dependia de um método que não usava. A interface foi **dividida em duas**:
+- **`IAutenticacao`**, com `autenticar()`, usada pelo `CtrlAutenticacao`;
+- **`IServicoJogadores`**, com `buscarTodos()`, usada pelo `CtrlResumo` e pelo `CtrlJogadores`.
+
+As duas continuam falando com o mesmo serviço de Jogadores, mas cada controle conhece só o que
+precisa. O [diagrama de classes](../03-diagrama-de-classes/README.md) e o diagrama de sequência
+de [autenticação](../04-diagramas-de-sequencia/README.md#sq01--autenticar-administrador) foram
+atualizados.
