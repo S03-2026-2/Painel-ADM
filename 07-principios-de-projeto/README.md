@@ -81,3 +81,22 @@ A regra é **maximizar a coesão e minimizar o acoplamento**.
   conhece a camada de cima (ver o [diagrama de classes](../03-diagrama-de-classes/README.md)).
 - **Interfaces estáveis:** os controles dependem de `IServicoJogadores`, `IServicoCartas` e
   `IServicoTrocas`, e não da forma como cada serviço é acessado.
+
+## Responsabilidade única (SRP)
+
+**Teoria:** um módulo deve ter **um, e apenas um, motivo para mudar**. Os motivos de mudança
+são os usuários ou grupos que pedem alterações, então cada módulo deve atender um único grupo.
+Una o que muda pelo mesmo motivo e separe o que muda por motivos diferentes. O SRP é uma forma de
+obter coesão.
+
+**No painel, cada classe muda por um motivo diferente:**
+
+| Classe | Muda quando… |
+|---|---|
+| Telas (`Tela*`) | a forma de exibir os dados muda (layout, colunas, filtros) |
+| Controles (`Ctrl*`) | a regra de um caso de uso muda (o que contar, como agrupar) |
+| Interfaces de serviço (`IServico*`) | o que um dos outros grupos oferece muda |
+| Entidades | os dados enviados pelos outros grupos mudam |
+
+Se o grupo de Cartas mudar a forma de entregar as cartas, só a parte ligada a `IServicoCartas`
+muda. As telas e os outros controles ficam iguais.
