@@ -114,3 +114,19 @@ interface, sem alterar o código que já funciona.
 - **Nova forma de acessar um serviço:** como os controles usam interfaces, é possível criar outra
   implementação, por exemplo uma que devolve dados fixos para testar o painel sem os outros grupos
   no ar. Os controles continuam iguais.
+
+## Substituição de Liskov (LSP)
+
+**Teoria:** uma classe derivada deve poder **substituir a classe base** sem que o programa
+precise mudar. Se S é um subtipo de T, objetos do tipo T podem ser trocados por objetos do tipo
+S mantendo as propriedades esperadas. É o que permite usar polimorfismo com segurança.
+
+**No painel:** qualquer classe que implemente uma interface de serviço precisa cumprir o mesmo
+contrato, para que os controles funcionem com qualquer uma delas. Por exemplo, toda
+implementação de `IServicoCartas`:
+- devolve **todas** as cartas em `buscarTodas()`, cada uma com o dono atual;
+- devolve uma **lista vazia**, e não `null`, quando não há cartas;
+- **não altera** nenhum dado, porque o painel é somente leitura.
+
+Uma implementação que devolvesse só parte das cartas ou alterasse dados quebraria o
+`CtrlCartasJogadores`, mesmo tendo os mesmos métodos. Isso violaria o LSP.
