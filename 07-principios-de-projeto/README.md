@@ -100,3 +100,17 @@ obter coesão.
 
 Se o grupo de Cartas mudar a forma de entregar as cartas, só a parte ligada a `IServicoCartas`
 muda. As telas e os outros controles ficam iguais.
+
+## Aberto/Fechado (OCP)
+
+**Teoria:** as entidades de software devem estar **abertas para extensão e fechadas para
+modificação**. Um comportamento novo entra como uma classe nova, normalmente implementando uma
+interface, sem alterar o código que já funciona.
+
+**No painel:**
+- **Nova aba sem mexer nas existentes:** se o painel passar a mostrar, por exemplo, o histórico
+  de partidas de outro grupo, entram uma tela, um controle e uma interface de serviço novos. Nenhuma
+  tela ou controle existente precisa ser alterado.
+- **Nova forma de acessar um serviço:** como os controles usam interfaces, é possível criar outra
+  implementação, por exemplo uma que devolve dados fixos para testar o painel sem os outros grupos
+  no ar. Os controles continuam iguais.
