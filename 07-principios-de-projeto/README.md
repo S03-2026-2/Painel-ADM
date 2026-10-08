@@ -173,3 +173,39 @@ concretas**. Em outras palavras: prefira interfaces a classes e seja o mais abst
 **Ganho:** se um grupo mudar a forma de entregar os dados, ou se for preciso uma implementação
 de teste, só muda a classe `Cliente*`. Os controles e as telas continuam iguais. Isso é o que
 torna possíveis o **OCP** e o **LSP** descritos acima.
+
+## Princípio de Demeter
+
+**Teoria:** também chamado de princípio do menor conhecimento. Um método só deve chamar métodos:
+1. da própria classe;
+2. dos objetos recebidos como parâmetro;
+3. dos objetos criados pelo próprio método;
+4. dos atributos da própria classe.
+
+Ele evita "conversar com estranhos", como em `a.getB().getC().fazAlgo()`. No exemplo clássico,
+o entregador pede o pagamento ao cliente, e não pega a carteira do cliente para tirar o dinheiro.
+
+**No painel:**
+- **O controle entrega os dados prontos para a tela.** Para mostrar o histórico, a tela **não**
+  faz `troca.getPropostaAceita().getProponente().getNick()`. O `CtrlTrocas` já associa os nicks
+  antes de devolver a lista, como mostram as auto-mensagens "associa nicks…" nos
+  [diagramas de sequência](../04-diagramas-de-sequencia/README.md). A tela só fala com o
+  controle, que ela recebe como atributo.
+- **Os controles só chamam seus atributos:** cada controle conversa apenas com as interfaces de
+  serviço que guarda como atributo (caso 4) e com os objetos que ele mesmo monta, como o
+  `ResumoPainel` (caso 3).
+- **As entidades se referenciam pelos dados, não por cadeias de objetos:** quem precisa do nick de
+  um jogador recebe o nick pronto, sem navegar de troca para proposta e de proposta para jogador.
+
+## Resumo
+
+| Princípio | Propriedade que reforça | Onde aparece no painel |
+|---|---|---|
+| Integridade conceitual | Coerência | Padrão de nomes, cores e estrutura tela → controle → serviço |
+| Ocultamento de informação | Ocultamento | Atributos privados, entidades só com getters |
+| Responsabilidade única (SRP) | Coesão | Tela exibe, controle organiza, cliente acessa o serviço |
+| Segregação de interfaces (ISP) | Coesão | `IAutenticacao` separada de `IServicoJogadores` |
+| Inversão de dependência (DIP) | Acoplamento | Controles dependem das interfaces; `Cliente*` as implementam |
+| Aberto/Fechado (OCP) | Extensibilidade | Nova aba ou nova implementação sem alterar o que existe |
+| Substituição de Liskov (LSP) | Extensibilidade | Qualquer implementação de uma interface cumpre o mesmo contrato |
+| Demeter | Ocultamento de informação | Controle entrega dados prontos; a tela não navega entre objetos |
