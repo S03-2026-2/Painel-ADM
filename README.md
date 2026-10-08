@@ -19,3 +19,4 @@ histórico de trocas finalizadas. Os dados vêm dos serviços dos grupos de **Jo
 | [04-diagramas-de-sequencia](04-diagramas-de-sequencia/README.md) | Um diagrama de sequência por caso de uso |
 | [05-diagrama-de-atividades](05-diagrama-de-atividades/README.md) | Fluxo completo do administrador, com raias |
 | [06-arquitetura](06-arquitetura/README.md) | Diagramas de componentes e de implantação e decisões de arquitetura |
+| [07-principios-de-projeto](07-principios-de-projeto/README.md) | Propriedades e princípios de projeto aplicados ao painel |
