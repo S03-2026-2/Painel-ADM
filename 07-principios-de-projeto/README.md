@@ -59,3 +59,25 @@ manter e testar, e pode ter um único responsável.
   e propostas) e consultam o mesmo serviço, então os métodos estão fortemente relacionados. Se
   esses casos de uso passarem a mudar por motivos diferentes, o controle pode ser dividido em
   três.
+
+## Acoplamento
+
+**Teoria:** acoplamento é a força da conexão entre duas classes. Ele não é ruim por si só: o
+problema é a forma como acontece.
+- **Acoplamento bom:** a classe A usa apenas métodos públicos da classe B, e a interface de B é
+  estável.
+- **Acoplamento ruim:** A acessa direto o arquivo ou o banco de dados de B, as duas compartilham
+  uma estrutura de dados global, ou a interface de B muda com frequência.
+
+A regra é **maximizar a coesão e minimizar o acoplamento**.
+
+**No painel:**
+- **O painel nunca acessa o banco dos outros grupos.** Ele só usa as operações que os serviços
+  de Jogadores, Cartas e Trocas oferecem. É exatamente o contrário do exemplo de acoplamento ruim
+  (ler o arquivo ou o banco de outra classe).
+- **O painel não tem banco próprio nem dados globais compartilhados:** cada controle recebe os
+  dados de que precisa e devolve o resultado para a tela.
+- **Dependências em uma direção só:** tela → controle → interface de serviço. Uma camada nunca
+  conhece a camada de cima (ver o [diagrama de classes](../03-diagrama-de-classes/README.md)).
+- **Interfaces estáveis:** os controles dependem de `IServicoJogadores`, `IServicoCartas` e
+  `IServicoTrocas`, e não da forma como cada serviço é acessado.
