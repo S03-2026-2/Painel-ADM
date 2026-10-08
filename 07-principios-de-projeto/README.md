@@ -22,3 +22,20 @@ sistema.
   entidade.
 - **Mesmo comportamento das telas:** todas as abas tratam "serviço indisponível" e "lista vazia"
   da mesma forma (cenários alternativos dos [casos de uso](../02-casos-de-uso/README.md)).
+
+## Ocultamento de informação
+
+**Teoria:** cada classe esconde as decisões que podem mudar. Os atributos ficam privados e o
+acesso acontece por um conjunto de métodos públicos, que formam a interface da classe. Essa
+parte visível precisa ser estável, porque qualquer mudança nela afeta todos os clientes.
+Getters e setters só devem existir quando fizer sentido: um setter é uma exposição.
+
+**No painel:**
+- **Atributos privados e só getters nas entidades:** `Jogador`, `Carta`, `Troca`, `Proposta`,
+  `Sessao` e `ResumoPainel` têm todos os atributos `-` (private) e apenas métodos `+get...()`.
+  Como o painel é somente leitura, **não faz sentido expor setters**: nenhum dado pode ser
+  alterado por fora (ver o [diagrama de classes](../03-diagrama-de-classes/README.md)).
+- **Dado calculado sem expor o cálculo:** `Troca.tempoEmAberto()` devolve o tempo pronto. Quem
+  usa não precisa saber que ele vem da diferença entre agora e `dataAbertura`.
+- **As telas não sabem de onde vêm os dados:** elas só chamam métodos públicos dos controles. Se
+  a forma de consultar os outros grupos mudar, as telas não mudam.

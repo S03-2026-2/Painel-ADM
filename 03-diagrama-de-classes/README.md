@@ -16,7 +16,8 @@ diagramas:
 ## Conceitos de orientação a objetos aplicados
 
 - **Encapsulamento:** atributos `-` (private) e métodos `+` (public), seguindo a regra geral de
-  encapsulamento.
+  encapsulamento. As entidades têm **só getters**: como o painel é somente leitura, nenhum dado
+  pode ser alterado por fora.
 - **Interface como contrato:** `IServicoJogadores`, `IServicoCartas` e `IServicoTrocas` dizem
   **o que** cada serviço oferece. Os controles usam só esse contrato, sem conhecer **como** o
   serviço é acessado (abstração).
