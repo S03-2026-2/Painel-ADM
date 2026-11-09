@@ -20,3 +20,11 @@ histórico de trocas finalizadas. Os dados vêm dos serviços dos grupos de **Jo
 | [05-diagrama-de-atividades](05-diagrama-de-atividades/README.md) | Fluxo completo do administrador, com raias |
 | [06-arquitetura](06-arquitetura/README.md) | Diagramas de componentes e de implantação e decisões de arquitetura |
 | [07-principios-de-projeto](07-principios-de-projeto/README.md) | Propriedades e princípios de projeto aplicados ao painel |
+| [backend](backend/README.md) | Código do backend do painel (Spring Boot): API, controles, serviços, entidades e testes |
+| [frontend](frontend/README.md) | Código da Interface Web do painel (React) |
+
+## Como rodar o painel
+
+1. Backend (Java 21+ e Maven): na pasta `backend`, rode `mvn spring-boot:run` (porta 8080).
+2. Frontend (Node.js 20+): na pasta `frontend`, rode `npm install` e depois `npm run dev`.
+3. Abra `http://localhost:5173`. No modo de teste, o login é `admin` / `admin`.

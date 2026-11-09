@@ -1,0 +1,210 @@
+:root {
+  --fundo: #f2f2f2;
+  --superficie: #ffffff;
+  --texto: #313131;
+  --texto-suave: #616161;
+  --cinza-imagem: #f2f2f2;
+  --borda: #e0e0e0;
+  --azul: #30a7d7;
+  --azul-escuro: #1b82b1;
+  --laranja: #ee6b2f;
+  --aviso-fundo: #fff4e5;
+  --aviso-borda: #e8a33d;
+  font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  color: var(--texto);
+  background: var(--fundo);
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; }
+h1, h2, h3, h4, h5 { margin: 0; }
+
+button {
+  font: inherit;
+  padding: 8px 18px;
+  border: none;
+  border-radius: 5px;
+  background: var(--azul);
+  color: #fff;
+  font-weight: 600;
+  cursor: pointer;
+}
+button:hover { background: var(--azul-escuro); }
+button:disabled { opacity: 0.6; cursor: default; }
+button.secundario { background: transparent; color: var(--texto); border: 1px solid var(--borda); }
+button.secundario:hover { background: #eaeaea; }
+
+.topo { background: var(--superficie); box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08); }
+.topo__barra {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.topo__titulo { font-size: 20px; font-weight: 700; }
+.menu {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  flex-wrap: wrap;
+}
+.menu__aba {
+  flex: 1;
+  min-width: 120px;
+  text-align: center;
+  padding: 12px 8px;
+  color: var(--texto-suave);
+  text-decoration: none;
+  font-weight: 600;
+  border-bottom: 5px solid var(--cor-aba);
+}
+.menu__aba:hover { background: #fafafa; }
+.menu__aba.active { background: var(--cor-aba); color: #fff; }
+
+.conteudo {
+  max-width: 1200px;
+  margin: 24px auto;
+  padding: 32px 24px;
+  background: var(--superficie);
+  min-height: 70vh;
+  overflow-x: auto;
+}
+.titulo-pagina { font-size: 30px; font-weight: 400; margin-bottom: 24px; }
+
+.info { color: var(--texto-suave); }
+.aviso {
+  background: var(--aviso-fundo);
+  border: 1px solid var(--aviso-borda);
+  border-radius: 5px;
+  padding: 12px 16px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.aviso p { margin: 0; }
+
+.busca {
+  background: #313131;
+  color: #fff;
+  padding: 20px 24px;
+  border-radius: 5px;
+  margin-bottom: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.busca label { font-size: 18px; }
+.busca__campo { display: flex; gap: 8px; }
+.busca input {
+  flex: 1;
+  font: inherit;
+  padding: 10px 14px;
+  border: 2px solid #616161;
+  border-radius: 5px;
+}
+.busca .secundario { color: #fff; border-color: #616161; }
+.busca .secundario:hover { background: #4a4a4a; }
+
+.grupo { margin-bottom: 40px; }
+.grupo__titulo { font-size: 22px; margin-bottom: 16px; padding-bottom: 8px; border-bottom: 2px solid var(--borda); }
+.contagem { color: var(--texto-suave); font-weight: 400; font-size: 16px; margin-left: 8px; }
+.grade-pokedex {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 24px 16px;
+}
+
+.carta-pokemon { margin: 0; }
+.carta-pokemon__imagem {
+  background: var(--cinza-imagem);
+  border-radius: 5px;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s;
+}
+.carta-pokemon:hover .carta-pokemon__imagem { transform: translateY(-4px); }
+.carta-pokemon__imagem img { width: 90%; height: 90%; object-fit: contain; }
+.carta-pokemon__sem-imagem { font-size: 48px; color: #bdbdbd; }
+.carta-pokemon figcaption { padding: 8px 4px 0; }
+.carta-pokemon__numero { margin: 0; color: #919191; font-size: 14px; font-weight: 600; }
+.carta-pokemon__nome { font-size: 20px; text-transform: capitalize; margin: 2px 0 6px; }
+
+.tipos { display: flex; gap: 4px; flex-wrap: wrap; }
+.tipo {
+  display: inline-block;
+  min-width: 70px;
+  text-align: center;
+  padding: 2px 8px;
+  border-radius: 3px;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.mini-pokemon { display: flex; gap: 12px; align-items: center; }
+.mini-pokemon__imagem {
+  width: 64px;
+  height: 64px;
+  flex: none;
+  background: var(--cinza-imagem);
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mini-pokemon__imagem img { width: 90%; height: 90%; object-fit: contain; }
+.mini-pokemon__numero { display: block; color: #919191; font-size: 12px; font-weight: 600; }
+.mini-pokemon__nome { display: block; text-transform: capitalize; margin-bottom: 4px; }
+
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--borda); vertical-align: middle; }
+th { background: #313131; color: #fff; font-weight: 600; }
+th:first-child { border-top-left-radius: 5px; }
+th:last-child { border-top-right-radius: 5px; }
+tbody tr:hover { background: #fafafa; }
+.numero { text-align: right; }
+
+.cartoes { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+.cartao-numero {
+  background: var(--cinza-imagem);
+  border-radius: 5px;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  border-left: 6px solid var(--azul);
+}
+.cartao-numero strong { font-size: 40px; }
+.cartao-numero span { color: var(--texto-suave); }
+
+.filtros { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.filtro { background: #a4a4a4; }
+.filtro:hover { background: #8a8a8a; }
+.filtro--ativo, .filtro--ativo:hover { background: var(--laranja); }
+.status { padding: 2px 10px; border-radius: 3px; font-size: 12px; font-weight: 700; }
+.status-pendente { background: #fff2cc; }
+.status-aceita { background: #d5e8d4; }
+.status-recusada { background: #f8cecc; }
+
+.tela-login { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 16px; }
+.tela-login form {
+  width: 100%;
+  max-width: 380px;
+  background: var(--superficie);
+  border-top: 6px solid #e3350d;
+  border-radius: 5px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.tela-login h1 { font-size: 24px; }
+.tela-login label { display: flex; flex-direction: column; gap: 4px; font-weight: 600; }
+.tela-login input { font: inherit; padding: 10px 14px; border: 2px solid var(--borda); border-radius: 5px; }
+.tela-login .aviso { display: block; margin: 0; }
