@@ -10,24 +10,6 @@ em Spring Boot), que consulta os serviços dos grupos de Jogadores, Cartas e Tro
 Interface Web (este projeto)  →  /api  →  Backend do Painel (Spring Boot)  →  outros grupos
 ```
 
-## Como rodar
-
-1. Suba o backend (pasta `backend`): `mvn spring-boot:run`, na porta 8080.
-2. Aqui, com o **Node.js 20+**:
-
-```bash
-npm install
-```
-
-```bash
-npm run dev
-```
-
-3. Abra `http://localhost:5173`. No modo de teste do backend, o login é `admin` / `admin`.
-
-As chamadas para `/api` são repassadas para `http://localhost:8080` pelo proxy do Vite
-(`vite.config.ts`), sem problema de CORS.
-
 ## Organização do código
 
 | Pasta | Conteúdo |

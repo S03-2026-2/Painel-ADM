@@ -9,33 +9,6 @@ Interface Web (React)  →  /api  →  Backend do Painel  →  serviços de Joga
                                                       →  PokéAPI (nome, tipos e imagem)
 ```
 
-## Como rodar
-
-Precisa do **Java 21+** e do **Maven**. No IntelliJ, abra a pasta: ele reconhece o `pom.xml`.
-
-```bash
-mvn spring-boot:run
-```
-
-Sobe em `http://localhost:8080`. No modo de teste (padrão), usa serviços falsos com dados de
-exemplo. Login: `admin` / `admin`. O login `ash` / `ash` é um jogador comum (acesso negado).
-
-Para rodar os testes:
-
-```bash
-mvn test
-```
-
-## Configuração (`src/main/resources/application.properties`)
-
-| Propriedade | Padrão | Para quê |
-|---|---|---|
-| `painel.usar-fakes` | `true` | `false` = chama os serviços reais dos outros grupos |
-| `painel.url.jogadores` / `cartas` / `trocas` | `localhost:8081…8083` | URL de cada serviço |
-| `painel.url.pokeapi` | `https://pokeapi.co/api/v2` | PokéAPI |
-| `painel.url.pokeapi-espelho` | espelho da PokéAPI no GitHub | Usado quando a PokéAPI está bloqueada ou fora do ar (ex.: rede com firewall que bloqueia `pokeapi.co`) |
-| `painel.pokeapi.usar-fake` | `false` | `true` = tabela local com os 15 Pokémon de exemplo (sem internet) |
-
 ## API para a Interface Web
 
 Todas as rotas, menos o login, exigem o cabeçalho `Authorization: Bearer <token>`.
@@ -66,18 +39,7 @@ Se um serviço dos outros grupos estiver fora do ar, a resposta é `503 {mensage
 | `entidades` | `Jogador`, `Carta`, `Troca`, `Proposta`, `Sessao`, `ResumoPainel` e enumerações |
 | `config` | Único lugar que escolhe entre clientes reais e fakes e monta os controles |
 
-**Princípios aplicados**
-- **Ocultamento de informação:** entidades com atributos `private final` e só getters; listas
-  imutáveis.
-- **Composição:** cada `Troca` contém as suas `Proposta`s.
-- **Responsabilidade única:** a API só traduz HTTP; os controles só organizam os dados; os
-  clientes só falam com um serviço; `CatalogoPokemon` e `ConversorRespostas` separados.
-- **Inversão de dependência:** os controles recebem só interfaces e não conhecem o Spring.
-- **Segregação de interfaces:** login usa só `IAutenticacao`.
-- **Aberto/Fechado e Liskov:** fakes e clientes reais podem ser trocados sem mexer nos controles.
-- **Demeter:** os controles entregam nicks, cartas e tempos prontos.
-- **Desempenho:** no máximo uma consulta por serviço dos outros grupos em cada tela, e cache dos
-  dados da PokéAPI no servidor.
+Os princípios de projeto aplicados estão em [07-principios-de-projeto](../07-principios-de-projeto/README.md).
 
 ## Contrato esperado do serviço de Trocas
 
