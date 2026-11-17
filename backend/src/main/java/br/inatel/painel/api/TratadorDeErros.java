@@ -1,6 +1,7 @@
 package br.inatel.painel.api;
 
 import br.inatel.painel.api.Dtos.ErroSaida;
+import br.inatel.painel.servicos.CredenciaisInvalidasException;
 import br.inatel.painel.servicos.ServicoIndisponivelException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -14,5 +15,11 @@ public class TratadorDeErros {
     @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
     public ErroSaida servicoIndisponivel(ServicoIndisponivelException erro) {
         return new ErroSaida(erro.getMessage());
+    }
+
+    @ExceptionHandler(CredenciaisInvalidasException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public ErroSaida tokenRecusado() {
+        return new ErroSaida("Sessão expirada. Entre novamente.");
     }
 }
