@@ -100,3 +100,35 @@ FabricaServicos fabrica = usarFakes
 - Um **tipo** novo de serviço, por exemplo um `IServicoNotificacoes`, obriga a mudar a interface
   `FabricaServicos` e **todas** as fábricas.
 - Para quatro serviços, é mais código do que o `if` que existia antes.
+
+## Padrões que já estavam no código
+
+Alguns padrões apareceram antes mesmo de terem nome, porque resolviam problemas do painel:
+
+| Padrão | Grupo | Onde está | Problema que resolve |
+|---|---|---|---|
+| **Adapter** | estrutural | `ClienteServicoJogadores`, `ClienteServicoCartas`, `ClienteServicoTrocas`, junto com o `ConversorRespostas` | Cada grupo devolve o JSON no seu formato. Os clientes **adaptam** essas respostas às interfaces e às entidades do painel. Se um contrato mudar, só o adaptador daquele serviço muda. |
+| **Facade** | estrutural | `ApiPainel` (Interface Web) e `PainelApi` (backend) | As telas falam com **uma porta só**, sem saber de URLs, tokens nem dos serviços dos outros grupos. A `PainelApi` faz o mesmo para a Interface Web: uma rota por tela, com os dados prontos. |
+| **Strategy** | comportamental | `IServicoJogadores`, `IServicoCartas`, `IServicoTrocas` e `IServicoPokemon`, cada um com uma versão falsa e uma real | Famílias de implementações **intercambiáveis**: os controles usam a interface e a implementação pode ser trocada sem mexer neles. |
+| **Chain of Responsibility** | comportamental | `FiltroDeSessao`, registrado na cadeia de interceptadores do Spring | A requisição passa pelo filtro antes de chegar na API. Sem um token válido, a cadeia para ali e a resposta é `401`. |
+
+## Padrões que não usamos, e por quê
+
+- **Singleton:** o Spring já cria uma instância só de cada bean. Escrever um Singleton à mão
+  repetiria isso e dificultaria os testes.
+- **Observer:** o painel consulta os dados quando o administrador abre uma aba. Não há eventos em
+  tempo real para observar.
+- **Builder:** `ResumoPainel` tem só cinco campos, e um construtor basta.
+
+## Resumo
+
+| Padrão | Grupo | Classes | Princípios que reforça |
+|---|---|---|---|
+| Abstract Factory | criacional | `FabricaServicos`, `FabricaFakes`, `FabricaClientesReais` | aberto/fechado, inversão de dependência |
+| Decorator | estrutural | `PokeAPIComEspelho`, `PokeAPIComCache` | responsabilidade única, aberto/fechado |
+| Adapter | estrutural | `Cliente*`, `ConversorRespostas` | ocultamento de informação, baixo acoplamento |
+| Facade | estrutural | `ApiPainel`, `PainelApi` | Demeter, baixo acoplamento |
+| Strategy | comportamental | implementações falsas e reais das interfaces de serviço | substituição de Liskov, inversão de dependência |
+| Chain of Responsibility | comportamental | `FiltroDeSessao` | responsabilidade única |
+
+Os princípios estão explicados em [07-principios-de-projeto](../07-principios-de-projeto/README.md).
