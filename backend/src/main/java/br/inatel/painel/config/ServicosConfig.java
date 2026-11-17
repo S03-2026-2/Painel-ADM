@@ -16,6 +16,8 @@ import br.inatel.painel.servicos.clientes.ClientePokeAPI;
 import br.inatel.painel.servicos.clientes.ClienteServicoCartas;
 import br.inatel.painel.servicos.clientes.ClienteServicoJogadores;
 import br.inatel.painel.servicos.clientes.ClienteServicoTrocas;
+import br.inatel.painel.servicos.decoradores.PokeAPIComCache;
+import br.inatel.painel.servicos.decoradores.PokeAPIComEspelho;
 import br.inatel.painel.servicos.fakes.FakePokeAPI;
 import br.inatel.painel.servicos.fakes.FakeServicoCartas;
 import br.inatel.painel.servicos.fakes.FakeServicoJogadores;
@@ -37,7 +39,13 @@ public class ServicosConfig {
     public IServicoPokemon pokeapi(@Value("${painel.pokeapi.usar-fake}") boolean usarFake,
                                    @Value("${painel.url.pokeapi}") String url,
                                    @Value("${painel.url.pokeapi-espelho:}") String urlEspelho) {
-        return usarFake ? new FakePokeAPI() : new ClientePokeAPI(url, urlEspelho);
+        if (usarFake) return new FakePokeAPI();
+        IServicoPokemon servico = new ClientePokeAPI("PokéAPI", url + "/pokemon/{id}");
+        if (!urlEspelho.isBlank()) {
+            servico = new PokeAPIComEspelho(servico,
+                    new ClientePokeAPI("espelho da PokéAPI", urlEspelho + "/pokemon/{id}/index.json"));
+        }
+        return new PokeAPIComCache(servico);
     }
 
     @Bean

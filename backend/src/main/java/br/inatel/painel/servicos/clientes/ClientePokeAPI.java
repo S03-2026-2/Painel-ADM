@@ -14,7 +14,6 @@ import tools.jackson.databind.json.JsonMapper;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class ClientePokeAPI implements IServicoPokemon {
 
@@ -24,46 +23,26 @@ public class ClientePokeAPI implements IServicoPokemon {
     private final RestClient rest = RestClient.builder()
             .defaultHeader(HttpHeaders.USER_AGENT, "painel-adm/0.1 (projeto academico)")
             .build();
-    private final Map<Integer, DadosPokemon> cache = new ConcurrentHashMap<>();
-    private final String urlBase;
-    private final String urlEspelho;
-    private volatile boolean avisouEspelho;
+    private final String nome;
+    private final String modeloUrl;
+    private volatile boolean avisou;
 
-    public ClientePokeAPI(String urlBase, String urlEspelho) {
-        this.urlBase = urlBase;
-        this.urlEspelho = urlEspelho;
+    public ClientePokeAPI(String nome, String modeloUrl) {
+        this.nome = nome;
+        this.modeloUrl = modeloUrl;
     }
 
     @Override
     public DadosPokemon buscarPokemon(int id) {
-        DadosPokemon emCache = cache.get(id);
-        if (emCache != null) return emCache;
-        DadosPokemon dados = requisitar(id);
-        cache.put(id, dados);
-        return dados;
-    }
-
-    private DadosPokemon requisitar(int id) {
-        String url = urlBase + "/pokemon/" + id;
+        String url = modeloUrl.replace("{id}", String.valueOf(id));
         try {
             return converter(buscarJson(url));
         } catch (RestClientException erro) {
-            if (urlEspelho == null || urlEspelho.isBlank()) {
-                LOG.warn("Falha ao consultar a PokéAPI ({}): {}", url, causaRaiz(erro));
-                throw new ServicoIndisponivelException("PokéAPI");
+            if (!avisou) {
+                avisou = true;
+                LOG.warn("Falha ao consultar {} ({}): {}", nome, url, causaRaiz(erro));
             }
-            if (!avisouEspelho) {
-                avisouEspelho = true;
-                LOG.warn("PokéAPI indisponível ({}). Usando o espelho da PokéAPI no GitHub.", causaRaiz(erro));
-            }
-        }
-
-        String espelho = urlEspelho + "/pokemon/" + id + "/index.json";
-        try {
-            return converter(buscarJson(espelho));
-        } catch (RestClientException erro) {
-            LOG.warn("Falha ao consultar o espelho da PokéAPI ({}): {}", espelho, causaRaiz(erro));
-            throw new ServicoIndisponivelException("PokéAPI");
+            throw new ServicoIndisponivelException(nome);
         }
     }
 

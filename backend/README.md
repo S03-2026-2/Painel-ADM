@@ -35,11 +35,13 @@ Se um serviço dos outros grupos estiver fora do ar, a resposta é `503 {mensage
 | `servicos` | Interfaces `IAutenticacao`, `IServicoJogadores`, `IServicoCartas`, `IServicoTrocas`, `IServicoPokemon` |
 | `servicos.clientes` | `ClienteServicoJogadores` (implementa `IAutenticacao` e `IServicoJogadores`), `ClienteServicoCartas`, `ClienteServicoTrocas`, `ClientePokeAPI` |
 | `servicos.fakes` | Implementações falsas das mesmas interfaces, com dados de exemplo |
+| `servicos.decoradores` | `PokeAPIComEspelho` e `PokeAPIComCache`: camadas em volta da PokéAPI (Decorator) |
 | `servicos.montagem` | `CatalogoPokemon` (busca na PokéAPI) e `ConversorRespostas` (JSON → entidades) |
 | `entidades` | `Jogador`, `Carta`, `Troca`, `Proposta`, `Sessao`, `ResumoPainel` e enumerações |
 | `config` | Único lugar que escolhe entre clientes reais e fakes e monta os controles |
 
-Os princípios de projeto aplicados estão em [07-principios-de-projeto](../07-principios-de-projeto/README.md).
+Os princípios de projeto aplicados estão em [07-principios-de-projeto](../07-principios-de-projeto/README.md)
+e os padrões de projeto em [08-padroes-de-projeto](../08-padroes-de-projeto/README.md).
 
 ## Contrato esperado do serviço de Trocas
 
