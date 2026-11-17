@@ -59,3 +59,44 @@ ou as duas coisas.
 - A **ordem** das camadas importa e o compilador não avisa se ela estiver errada. Com o cache por
   fora, o que veio do espelho também fica guardado. Com o cache por dentro, só a PokéAPI original
   teria cache.
+
+## Abstract Factory (criacional) – família de serviços fake ou real
+
+![Abstract Factory](abstract-factory.drawio.svg)
+
+**Problema.** O painel conversa com quatro serviços dos outros grupos: autenticação, jogadores,
+cartas e trocas. Enquanto os grupos não terminam os seus serviços, o painel usa versões falsas com
+dados de exemplo. O `ServicosConfig` tinha um `if (usarFakes)` que montava cada serviço nos dois
+ramos. Nada impedia de misturar as famílias, por exemplo um login falso com o serviço de Cartas
+real, o que quebraria o token. E cada serviço novo precisava ser lembrado nos dois ramos do `if`.
+
+**Solução.** Uma interface `FabricaServicos` declara um método de criação para cada serviço. Cada
+família tem a sua fábrica concreta:
+
+| Classe | Papel no padrão | Cria |
+|---|---|---|
+| `FabricaServicos` | fábrica abstrata | contrato: `criarAutenticacao()`, `criarServicoJogadores()`, `criarServicoCartas()`, `criarServicoTrocas()` |
+| `FabricaFakes` | fábrica concreta | `FakeServicoJogadores`, `FakeServicoCartas`, `FakeServicoTrocas` |
+| `FabricaClientesReais` | fábrica concreta | `ClienteServicoJogadores`, `ClienteServicoCartas`, `ClienteServicoTrocas`, todos com o mesmo `ClienteHttp` |
+| `IAutenticacao`, `IServicoJogadores`, `IServicoCartas`, `IServicoTrocas` | produtos abstratos | o que os controles conhecem |
+
+O `ServicosConfig` escolhe a fábrica **uma vez**, pela propriedade `painel.usar-fakes`, e pede a
+ela todos os serviços:
+
+```java
+FabricaServicos fabrica = usarFakes
+        ? new FabricaFakes(conversor)
+        : new FabricaClientesReais(TokenDaRequisicao::atual, urls, conversor);
+```
+
+**Consequências positivas**
+- A família fica sempre **coerente**: todos os serviços vêm da mesma fábrica.
+- A configuração não conhece nenhuma classe concreta de serviço. Ela só escolhe a fábrica.
+- Uma família nova, por exemplo os serviços de homologação de outro grupo, é **uma fábrica nova**,
+  sem mexer nos controles nem nas outras fábricas (aberto/fechado).
+- Os controles continuam recebendo só as interfaces (inversão de dependência).
+
+**Consequências negativas**
+- Um **tipo** novo de serviço, por exemplo um `IServicoNotificacoes`, obriga a mudar a interface
+  `FabricaServicos` e **todas** as fábricas.
+- Para quatro serviços, é mais código do que o `if` que existia antes.

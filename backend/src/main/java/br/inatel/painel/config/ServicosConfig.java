@@ -11,17 +11,13 @@ import br.inatel.painel.servicos.IServicoCartas;
 import br.inatel.painel.servicos.IServicoJogadores;
 import br.inatel.painel.servicos.IServicoPokemon;
 import br.inatel.painel.servicos.IServicoTrocas;
-import br.inatel.painel.servicos.clientes.ClienteHttp;
 import br.inatel.painel.servicos.clientes.ClientePokeAPI;
-import br.inatel.painel.servicos.clientes.ClienteServicoCartas;
-import br.inatel.painel.servicos.clientes.ClienteServicoJogadores;
-import br.inatel.painel.servicos.clientes.ClienteServicoTrocas;
 import br.inatel.painel.servicos.decoradores.PokeAPIComCache;
 import br.inatel.painel.servicos.decoradores.PokeAPIComEspelho;
+import br.inatel.painel.servicos.fabricas.FabricaClientesReais;
+import br.inatel.painel.servicos.fabricas.FabricaFakes;
+import br.inatel.painel.servicos.fabricas.FabricaServicos;
 import br.inatel.painel.servicos.fakes.FakePokeAPI;
-import br.inatel.painel.servicos.fakes.FakeServicoCartas;
-import br.inatel.painel.servicos.fakes.FakeServicoJogadores;
-import br.inatel.painel.servicos.fakes.FakeServicoTrocas;
 import br.inatel.painel.servicos.montagem.CatalogoPokemon;
 import br.inatel.painel.servicos.montagem.ConversorRespostas;
 import org.springframework.beans.factory.annotation.Value;
@@ -54,20 +50,20 @@ public class ServicosConfig {
     }
 
     @Bean
-    public Servicos servicos(ConversorRespostas conversor,
-                             @Value("${painel.usar-fakes}") boolean usarFakes,
-                             @Value("${painel.url.jogadores}") String urlJogadores,
-                             @Value("${painel.url.cartas}") String urlCartas,
-                             @Value("${painel.url.trocas}") String urlTrocas) {
-        if (usarFakes) {
-            FakeServicoJogadores jogadores = new FakeServicoJogadores(conversor);
-            return new Servicos(jogadores, jogadores, new FakeServicoCartas(conversor),
-                    new FakeServicoTrocas(conversor));
-        }
-        ClienteHttp http = new ClienteHttp(TokenDaRequisicao::atual);
-        ClienteServicoJogadores jogadores = new ClienteServicoJogadores(http, urlJogadores, conversor);
-        return new Servicos(jogadores, jogadores, new ClienteServicoCartas(http, urlCartas, conversor),
-                new ClienteServicoTrocas(http, urlTrocas, conversor));
+    public FabricaServicos fabricaServicos(ConversorRespostas conversor,
+                                           @Value("${painel.usar-fakes}") boolean usarFakes,
+                                           @Value("${painel.url.jogadores}") String urlJogadores,
+                                           @Value("${painel.url.cartas}") String urlCartas,
+                                           @Value("${painel.url.trocas}") String urlTrocas) {
+        if (usarFakes) return new FabricaFakes(conversor);
+        return new FabricaClientesReais(TokenDaRequisicao::atual,
+                new FabricaClientesReais.Urls(urlJogadores, urlCartas, urlTrocas), conversor);
+    }
+
+    @Bean
+    public Servicos servicos(FabricaServicos fabrica) {
+        return new Servicos(fabrica.criarAutenticacao(), fabrica.criarServicoJogadores(),
+                fabrica.criarServicoCartas(), fabrica.criarServicoTrocas());
     }
 
     @Bean
