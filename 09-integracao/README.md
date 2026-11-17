@@ -1,57 +1,71 @@
-# 09 – Integração com o Painel de Administração
+# 09 – Integração: como usar o Painel de Administração
 
-Guia para os grupos de **Jogadores**, **Cartas** e **Trocas**. Ele mostra o que o Painel de
-Administração precisa de cada serviço para mostrar as informações da plataforma.
+Guia para os outros grupos da plataforma usarem o **Painel de Administração**.
 
-O painel é **somente leitura**. Ele não tem banco próprio e não altera nada nos outros serviços:
-faz só o login do administrador e consultas `GET`.
+O painel junta, em um lugar só, as informações gerais da plataforma: jogadores e as suas cartas,
+trocas em aberto, propostas e histórico de trocas. Ele pode ser usado de duas formas:
 
-## Como o painel se conecta
+- pela **Interface Web**, para olhar os dados nas telas;
+- pela **API do painel**, para o serviço de vocês consultar os dados já prontos (com nicks, nomes
+  dos Pokémon, tipos e imagens).
+
+O painel é **somente leitura**: nenhuma rota altera dados.
+
+## O que o painel oferece
+
+| Informação | Tela | Rota da API |
+|---|---|---|
+| Totais da plataforma | Resumo geral | `GET /api/resumo` |
+| Jogadores e quantas cartas cada um tem | Jogadores | `GET /api/jogadores` |
+| Cartas de cada jogador, com nome, tipos e imagem do Pokémon | Cartas dos jogadores | `GET /api/cartas` |
+| Trocas em aberto, há quanto tempo e quantas propostas | Trocas em aberto | `GET /api/trocas/abertas` |
+| Propostas de troca e o status de cada uma | Propostas | `GET /api/propostas` |
+| Trocas finalizadas: quem trocou o quê com quem | Histórico de trocas | `GET /api/trocas/historico` |
 
 ```mermaid
-sequenceDiagram
-    participant ADM as Administrador (navegador)
-    participant P as Backend do Painel
-    participant J as Serviço de Jogadores
-    participant C as Serviço de Cartas
-    participant T as Serviço de Trocas
-
-    ADM->>P: login e senha
-    P->>J: POST /auth/login
-    J-->>P: token + perfil
-    Note over P: só segue se o perfil for ADMIN
-    ADM->>P: abre uma aba
-    P->>J: GET /jogadores (Bearer token)
-    P->>C: GET /cartas (Bearer token)
-    P->>T: GET /trocas (Bearer token)
-    P-->>ADM: dados prontos para a tela
+flowchart LR
+    G["Serviço de outro grupo"] -- "GET /api/... (Bearer token)" --> P["API do Painel"]
+    N["Navegador do administrador"] --> W["Interface Web do Painel"] --> P
+    P --> J["Jogadores"]
+    P --> C["Cartas"]
+    P --> T["Trocas"]
+    P --> K["PokéAPI"]
 ```
 
-- Quem chama os serviços é o **backend do painel**, nunca o navegador. Por isso **não é preciso
-  liberar CORS** para o painel.
-- Todas as consultas levam o token do administrador no cabeçalho
-  `Authorization: Bearer <token>`. É o mesmo token devolvido pelo serviço de Jogadores no login.
-- Nome, tipos e imagem de cada Pokémon vêm da **PokéAPI**. Os serviços só precisam informar o
-  `pokemonId` (número da Pokédex) de cada carta.
+O painel consulta Jogadores, Cartas, Trocas e a PokéAPI e devolve tudo **junto e pronto para
+mostrar**. Por exemplo, em vez de `ofertanteId: "j-001"` e `pokemonId: 25`, a resposta já traz
+`nickOfertante: "ashketchum"` e a carta com nome, tipos e imagem.
 
-## Convenções
+## Quem pode usar
 
-| Item | Combinado |
-|---|---|
-| Estilo | REST sobre HTTP, corpo em JSON |
-| Nomes dos campos | camelCase, exatamente como nas tabelas abaixo |
-| Identificadores | `String` (ex.: `"j-001"`, `"c-101"`, `"t-500"`) |
-| Número do Pokémon | `pokemonId`, inteiro da Pokédex nacional (ex.: `25` = Pikachu) |
-| Datas | ISO-8601 em UTC, com `Z` no final (ex.: `"2026-10-01T14:30:00Z"`) |
-| Status | texto em maiúsculas, com os valores exatos listados em cada serviço |
-| Campos a mais | podem existir: o painel **ignora** o que não usa |
-| Listas vazias | devolver `[]` com `200`, e não `404` |
+Só usuários com perfil **`ADMIN`** no serviço de Jogadores. O login do painel é o mesmo login da
+plataforma: o painel confere o usuário e a senha no serviço de Jogadores e só libera quem tem esse
+perfil.
 
-## Serviço de Jogadores
+Enquanto os serviços dos grupos não estão prontos, o painel roda com **dados de exemplo**. Nesse
+modo, o login de administrador é `admin` / `admin`. O usuário `ash` / `ash` é um jogador comum e
+recebe "acesso negado".
 
-### `POST /auth/login` – autenticar o administrador
+## Usando pela Interface Web
 
-Requisição:
+1. Abra o endereço da Interface Web do painel.
+2. Entre com um usuário administrador.
+3. Navegue pelas abas: **Resumo**, **Jogadores**, **Cartas**, **Trocas em aberto**, **Propostas**
+   e **Histórico**.
+
+Se um serviço estiver fora do ar, só a aba que depende dele mostra um aviso. As outras continuam
+funcionando.
+
+## Usando pela API
+
+- **Endereço base:** `http://<servidor-do-painel>:8080/api`
+- **Formato:** JSON, campos em camelCase, datas em ISO-8601 (UTC)
+- **Autenticação:** todas as rotas, menos o login, exigem o cabeçalho
+  `Authorization: Bearer <token>`
+- **De onde chamar:** do **backend** de vocês. Se precisarem chamar direto do navegador (de um
+  front-end), avisem o grupo do painel para liberarmos o endereço de vocês (CORS).
+
+### 1. Login – `POST /api/login`
 
 ```json
 { "login": "admin", "senha": "admin" }
@@ -60,201 +74,169 @@ Requisição:
 Resposta `200`:
 
 ```json
-{ "token": "eyJhbGciOi...", "jogadorId": "j-000", "perfil": "ADMIN" }
+{ "token": "token-fake-admin" }
 ```
 
-| Campo | Tipo | Obrigatório | Uso no painel |
-|---|---|---|---|
-| `token` | String | sim | enviado em todas as consultas aos três serviços |
-| `jogadorId` | String | sim | identifica quem está logado |
-| `perfil` | String | sim | `"ADMIN"` ou `"JOGADOR"`. Só `ADMIN` entra no painel; `JOGADOR` recebe "acesso negado". |
+Use esse `token` em todas as outras chamadas. Ele vale até o logout (`POST /api/logout`).
 
-Login ou senha errados: responder **`401`**.
-
-### `GET /jogadores` – lista de jogadores
-
-Usado em quase todas as telas, para trocar o id de cada jogador pelo **nick**.
+Login errado ou usuário sem perfil `ADMIN`: `401`
 
 ```json
-[
-  { "id": "j-001", "nick": "ashketchum", "email": "ash@exemplo.com", "dataCadastro": "2026-09-10T12:00:00Z" },
-  { "id": "j-002", "nick": "misty", "email": "misty@exemplo.com", "dataCadastro": "2026-09-11T09:30:00Z" }
-]
+{ "mensagem": "Acesso negado: login ou senha inválidos, ou usuário sem perfil de administrador." }
 ```
 
-| Campo | Tipo | Obrigatório | Uso no painel |
-|---|---|---|---|
-| `id` | String | sim | liga o jogador às cartas, trocas e propostas |
-| `nick` | String | sim | nome mostrado em todas as telas |
-| `email` | String | não | lista de jogadores |
-| `dataCadastro` | data | não | lista de jogadores |
+Exemplo completo com `curl`:
 
-## Serviço de Cartas
+```bash
+curl -X POST http://localhost:8080/api/login -H "Content-Type: application/json" -d "{\"login\":\"admin\",\"senha\":\"admin\"}"
+```
 
-### `GET /cartas` – todas as cartas, com o dono atual
+```bash
+curl http://localhost:8080/api/resumo -H "Authorization: Bearer token-fake-admin"
+```
 
-O painel faz **uma consulta só** e agrupa as cartas por jogador. Assim não é preciso uma chamada
-por jogador.
+### 2. Resumo geral – `GET /api/resumo`
 
 ```json
-[
-  { "id": "c-101", "jogadorId": "j-001", "pokemonId": 25, "dataRecebimento": "2026-09-10T12:00:05Z" },
-  { "id": "c-140", "jogadorId": "j-001", "pokemonId": 7, "dataRecebimento": "2026-09-28T15:42:00Z" }
-]
+{
+  "totalJogadores": 3,
+  "totalCartas": 15,
+  "trocasAbertas": 2,
+  "propostasPendentes": 2,
+  "trocasFinalizadas": 1
+}
 ```
 
-| Campo | Tipo | Obrigatório | Uso no painel |
-|---|---|---|---|
-| `id` | String | sim | identifica a carta |
-| `jogadorId` | String | sim | dono **atual** da carta. Depois de uma troca, precisa mostrar o novo dono. |
-| `pokemonId` | int | sim | o painel busca nome, tipos e imagem na PokéAPI |
-| `dataRecebimento` | data | não | quando o jogador recebeu a carta |
+Se um serviço não responder, os totais que dependem dele vêm como `null` e o resto vem
+normalmente.
 
-Se o serviço já guardar `nome`, `tipos` ou `imagemUrl`, pode mandar: esses campos são ignorados,
-porque o painel usa a PokéAPI.
-
-## Serviço de Trocas
-
-Valores de status:
-
-- **Troca:** `ABERTA`, `FINALIZADA`, `CANCELADA`
-- **Proposta:** `PENDENTE`, `ACEITA`, `RECUSADA`
-
-### `GET /trocas` – trocas, cada uma com as suas propostas
-
-O painel chama sem filtro (resumo geral) e com o filtro `?status=ABERTA` ou `?status=FINALIZADA`.
-
-**Importante:** cada troca precisa vir **com a lista das suas propostas** no campo `propostas`. É
-com ela que o painel conta as propostas pendentes e descobre qual proposta foi aceita, sem fazer
-uma consulta por troca.
+### 3. Jogadores – `GET /api/jogadores`
 
 ```json
 [
   {
-    "id": "t-480",
-    "ofertanteId": "j-002",
-    "cartaOferecida": { "id": "c-140", "pokemonId": 7 },
-    "status": "FINALIZADA",
-    "dataAbertura": "2026-09-28T10:00:00Z",
-    "dataFinalizacao": "2026-09-28T15:42:00Z",
-    "propostas": [
+    "id": "j-001",
+    "nick": "ashketchum",
+    "email": "ash@exemplo.com",
+    "dataCadastro": "2026-09-10T12:00:00Z",
+    "quantidadeCartas": 5
+  }
+]
+```
+
+### 4. Cartas dos jogadores – `GET /api/cartas`
+
+Uma entrada por jogador, com as cartas que ele tem hoje:
+
+```json
+[
+  {
+    "jogador": { "id": "j-001", "nick": "ashketchum" },
+    "cartas": [
       {
-        "id": "p-900",
-        "trocaId": "t-480",
-        "proponenteId": "j-001",
-        "cartaProposta": { "id": "c-102", "pokemonId": 4 },
-        "status": "ACEITA",
-        "dataProposta": "2026-09-28T11:20:00Z"
+        "id": "c-101",
+        "pokemonId": 25,
+        "nome": "pikachu",
+        "tipos": ["electric"],
+        "imagemUrl": "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/25.png"
       }
     ]
   }
 ]
 ```
 
-| Campo | Tipo | Obrigatório | Uso no painel |
-|---|---|---|---|
-| `id` | String | sim | identifica a troca |
-| `ofertanteId` | String | sim | quem colocou a carta para troca (vira o nick) |
-| `cartaOferecida` | `{ id, pokemonId }` | sim | carta colocada para troca |
-| `status` | String | sim | `ABERTA`, `FINALIZADA` ou `CANCELADA` |
-| `dataAbertura` | data | sim | usada para calcular há quanto tempo a troca está aberta |
-| `dataFinalizacao` | data | só nas finalizadas | mostrada no histórico |
-| `propostas` | lista de propostas | sim (pode ser `[]`) | contagem de propostas e proposta aceita |
+Todas as cartas das respostas do painel têm esse mesmo formato: `id`, `pokemonId`, `nome`, `tipos`
+e `imagemUrl`.
 
-### `GET /propostas` – todas as propostas
-
-Usado na tela de propostas. Cada item tem o mesmo formato das propostas de dentro da troca:
+### 5. Trocas em aberto – `GET /api/trocas/abertas`
 
 ```json
 [
   {
-    "id": "p-901",
-    "trocaId": "t-500",
-    "proponenteId": "j-003",
-    "cartaProposta": { "id": "c-141", "pokemonId": 1 },
-    "status": "PENDENTE",
-    "dataProposta": "2026-09-30T19:10:00Z"
+    "id": "t-500",
+    "nickOfertante": "ashketchum",
+    "cartaOferecida": { "id": "c-101", "pokemonId": 25, "nome": "pikachu", "tipos": ["electric"], "imagemUrl": "..." },
+    "dataAbertura": "2026-09-30T18:00:00Z",
+    "tempoEmAbertoMs": 4085468199,
+    "quantidadePropostas": 2
   }
 ]
 ```
 
-| Campo | Tipo | Obrigatório | Uso no painel |
-|---|---|---|---|
-| `id` | String | sim | identifica a proposta |
-| `trocaId` | String | sim | troca que recebeu a proposta |
-| `proponenteId` | String | sim | quem fez a proposta (vira o nick) |
-| `cartaProposta` | `{ id, pokemonId }` | sim | carta oferecida em troca |
-| `status` | String | sim | `PENDENTE`, `ACEITA` ou `RECUSADA` |
-| `dataProposta` | data | não | quando a proposta foi feita |
+`tempoEmAbertoMs` é o tempo desde a abertura, em milissegundos.
 
-## Respostas de erro
+### 6. Propostas – `GET /api/propostas`
 
-| Situação | Código esperado | O que o painel faz |
+```json
+[
+  {
+    "id": "p-900",
+    "trocaId": "t-480",
+    "nickProponente": "ashketchum",
+    "cartaProposta": { "id": "c-102", "pokemonId": 4, "nome": "charmander", "tipos": ["fire"], "imagemUrl": "..." },
+    "status": "ACEITA",
+    "dataProposta": "2026-09-28T12:10:00Z"
+  }
+]
+```
+
+`status`: `PENDENTE`, `ACEITA` ou `RECUSADA`.
+
+### 7. Histórico de trocas – `GET /api/trocas/historico`
+
+```json
+[
+  {
+    "id": "t-480",
+    "dataFinalizacao": "2026-09-28T15:42:00Z",
+    "nickOfertante": "misty",
+    "cartaOferecida": { "id": "c-140", "pokemonId": 7, "nome": "squirtle", "tipos": ["water"], "imagemUrl": "..." },
+    "nickReceptor": "ashketchum",
+    "cartaRecebida": { "id": "c-102", "pokemonId": 4, "nome": "charmander", "tipos": ["fire"], "imagemUrl": "..." }
+  }
+]
+```
+
+- `nickOfertante` colocou a `cartaOferecida` para troca.
+- `nickReceptor` é quem fez a proposta aceita: ficou com a `cartaOferecida` e deu a
+  `cartaRecebida`.
+- Sem proposta aceita, `nickReceptor` vem como `"—"` e `cartaRecebida` como `null`.
+
+### Erros
+
+| Código | Quando | Corpo |
 |---|---|---|
-| Sucesso | `200` | mostra os dados |
-| Login errado | `401` no `POST /auth/login` | mostra "acesso negado" na tela de login |
-| Token inválido ou vencido | `401` em uma consulta | volta para a tela de login, e o administrador entra de novo |
-| Erro interno ou serviço fora do ar | `500` ou `503`, ou sem resposta | mostra um aviso só na tela que depende daquele serviço; as outras continuam funcionando |
+| `401` | sem token, token inválido ou login errado | `{ "mensagem": "..." }` |
+| `503` | um serviço dos outros grupos está fora do ar | `{ "mensagem": "..." }` com o nome do serviço |
 
-No **resumo geral**, se um serviço não responder, só os totais dele aparecem como
-"indisponível".
+## Exemplos de uso por grupo
 
-## O que cada tela consulta
+| Grupo | Para que usar o painel | Rotas |
+|---|---|---|
+| **Jogadores** | Conferir quantos jogadores existem e se cada jogador novo recebeu as suas cartas | `/api/jogadores`, `/api/resumo` |
+| **Cartas** | Conferir a distribuição: quais cartas cada jogador tem, já com nome, tipos e imagem do Pokémon | `/api/cartas`, `/api/resumo` |
+| **Trocas** | Acompanhar trocas abertas e propostas, e conferir se, depois de uma troca, as cartas mudaram de dono | `/api/trocas/abertas`, `/api/propostas`, `/api/trocas/historico` e `/api/cartas` |
+| **Qualquer grupo** | Mostrar números gerais da plataforma ou testar se o seu serviço está entregando os dados certos | `/api/resumo` |
 
-| Tela do painel | Jogadores | Cartas | Trocas |
-|---|---|---|---|
-| Login | `POST /auth/login` | – | – |
-| Resumo geral | `GET /jogadores` | `GET /cartas` | `GET /trocas` |
-| Jogadores (com a quantidade de cartas) | `GET /jogadores` | `GET /cartas` | – |
-| Cartas dos jogadores | `GET /jogadores` | `GET /cartas` | – |
-| Trocas em aberto | `GET /jogadores` | – | `GET /trocas?status=ABERTA` |
-| Propostas | `GET /jogadores` | – | `GET /propostas` |
-| Histórico de trocas | `GET /jogadores` | – | `GET /trocas?status=FINALIZADA` |
+A última linha é útil durante o desenvolvimento: se os dados do seu serviço aparecem certos no
+painel, o contrato combinado está funcionando.
 
-## Como testar a integração
+## Para os seus dados aparecerem no painel
 
-O painel tem dados de exemplo no mesmo formato deste guia. Eles ficam em
-[`backend/.../fakes/DadosExemplo.java`](../backend/src/main/java/br/inatel/painel/servicos/fakes/DadosExemplo.java)
-e servem de referência para o JSON de cada serviço.
+O painel monta as respostas acima a partir destas rotas dos serviços de cada grupo:
 
-Para ligar o painel no serviço de vocês, o grupo do painel muda estas propriedades em
-`backend/src/main/resources/application.properties`:
+| Grupo | Rota que o painel consulta | Campos que o painel usa |
+|---|---|---|
+| Jogadores | `POST /auth/login` | `token`, `jogadorId`, `perfil` (`ADMIN` ou `JOGADOR`) |
+| Jogadores | `GET /jogadores` | `id`, `nick`, `email`, `dataCadastro` |
+| Cartas | `GET /cartas` | `id`, `jogadorId` (dono atual), `pokemonId`, `dataRecebimento` |
+| Trocas | `GET /trocas` e `GET /trocas?status=` | `id`, `ofertanteId`, `cartaOferecida { id, pokemonId }`, `status`, `dataAbertura`, `dataFinalizacao` e a lista `propostas` |
+| Trocas | `GET /propostas` | `id`, `trocaId`, `proponenteId`, `cartaProposta { id, pokemonId }`, `status`, `dataProposta` |
 
-| Propriedade | Valor |
-|---|---|
-| `painel.usar-fakes` | `false` (passa a chamar os serviços reais) |
-| `painel.url.jogadores` | URL base do serviço de Jogadores |
-| `painel.url.cartas` | URL base do serviço de Cartas |
-| `painel.url.trocas` | URL base do serviço de Trocas |
+- O painel envia o token do administrador (`Authorization: Bearer <token>`) em todas essas
+  consultas.
+- Nome, tipos e imagem vêm da PokéAPI: basta mandar o `pokemonId`.
+- Campos a mais são ignorados. Listas vazias devem vir como `[]`.
 
-Precisamos de cada grupo:
-
-1. a **URL base** do serviço (host e porta);
-2. um **usuário administrador** de teste no serviço de Jogadores;
-3. alguns dados cadastrados: jogadores com cartas, uma troca aberta com propostas e uma troca
-   finalizada.
-
-## Pontos para combinar
-
-**Jogadores**
-- [ ] Existe o perfil `ADMIN`? Como um jogador vira administrador?
-- [ ] O `POST /auth/login` devolve `token`, `jogadorId` e `perfil`?
-- [ ] Os serviços de Cartas e Trocas vão aceitar o token emitido por Jogadores? Como eles validam
-  esse token?
-
-**Cartas**
-- [ ] O `GET /cartas` devolve todas as cartas com o `jogadorId` do dono **atual**?
-- [ ] Depois de uma troca finalizada, quem atualiza o dono da carta (Trocas avisa Cartas)?
-
-**Trocas**
-- [ ] O `GET /trocas` aceita o filtro `?status=`?
-- [ ] Cada troca vem com a lista `propostas`?
-- [ ] Existe o `GET /propostas`?
-
-**Todos**
-- [ ] Nomes de rotas e campos iguais aos deste guia, ou um mapeamento combinado.
-- [ ] Datas em ISO-8601 com `Z` e IDs como texto.
-
-Se alguma rota ou campo precisar ser diferente, basta avisar o grupo do painel. A mudança fica
-só no cliente daquele serviço (`ClienteServicoJogadores`, `ClienteServicoCartas` ou
-`ClienteServicoTrocas`) e não afeta o resto do painel.
+Se alguma rota ou campo do seu serviço for diferente, avise o grupo do painel. A mudança fica só no
+cliente daquele serviço e não afeta o resto do painel nem quem usa a API do painel.

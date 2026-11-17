@@ -21,6 +21,6 @@ histórico de trocas finalizadas. Os dados vêm dos serviços dos grupos de **Jo
 | [06-arquitetura](06-arquitetura/README.md) | Diagramas de componentes e de implantação, padrões arquiteturais (SOA, SPA e MVC) e decisões de arquitetura |
 | [07-principios-de-projeto](07-principios-de-projeto/README.md) | Propriedades e princípios de projeto aplicados ao painel |
 | [08-padroes-de-projeto](08-padroes-de-projeto/README.md) | Padrões de projeto usados no código, com os seus diagramas |
-| [09-integracao](09-integracao/README.md) | Guia para os grupos de Jogadores, Cartas e Trocas integrarem os seus serviços com o painel |
+| [09-integracao](09-integracao/README.md) | Guia para os outros grupos usarem o painel, pela Interface Web ou pela API |
 | [backend](backend/README.md) | Código do backend do painel (Spring Boot): API, controles, serviços, entidades e testes |
 | [frontend](frontend/README.md) | Código da Interface Web do painel (React) |

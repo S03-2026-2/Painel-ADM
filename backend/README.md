@@ -50,4 +50,4 @@ Para cumprir "uma consulta por serviço", o painel espera que `GET /trocas` devo
 **já com as suas propostas** (campo `propostas`). Se o grupo de Trocas não mandar esse campo, a
 troca aparece sem propostas.
 
-Todas as rotas e campos esperados dos outros grupos estão no [guia de integração](../09-integracao/README.md).
+Como os outros grupos usam o painel, e o que ele lê de cada serviço, está no [guia de integração](../09-integracao/README.md).
