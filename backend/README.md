@@ -49,3 +49,5 @@ e os padrões de projeto em [08-padroes-de-projeto](../08-padroes-de-projeto/REA
 Para cumprir "uma consulta por serviço", o painel espera que `GET /trocas` devolva cada troca
 **já com as suas propostas** (campo `propostas`). Se o grupo de Trocas não mandar esse campo, a
 troca aparece sem propostas.
+
+Todas as rotas e campos esperados dos outros grupos estão no [guia de integração](../09-integracao/README.md).
